@@ -13,19 +13,6 @@ input.kv = await Deno.openKv();
 ## postCreate
 To build our handlers we can create separate pipe functions that only get triggered when the right message is received. 
 
-In this case, `postCreate` will only be called if the global `input` object looks like this:
-
-```js
-{
-    post: {
-        create: {
-            title: "New Blog Post",
-            body: "# New Blog Post \n Some copy"
-        }
-    }
-}
-```
-
 Pipedown uses the new JSON Pointer standard and provides the `$p` helper to help you conveniently fetch information from objects.
 
 To test this out, we can use the REPL and run the following command:
@@ -34,8 +21,8 @@ To test this out, we can use the REPL and run the following command:
 - if: /post/create
 - ```ts
     const post = $p.get(input, '/post/create')
-    post.slug = post.title.toLowerCase().replace(' ', '-');
-    input.post = input.kv.set(["blog", "posts", post.slug], post);
+    post.slug = post.title.toLowerCase().replaceAll(' ', '-');
+    input.post = await input.kv.set(["blog", "posts", post.slug], post);
     ```
 
 ## postRead
@@ -46,7 +33,7 @@ To test this out, we can use the REPL and run the following command:
 
 - if: /post/read
 - ```ts
-    const slug = $p.get(input, '/post/read')
+    const slug = $p.get(input, '/post/read/slug')
     input.post = await input.kv.get(["blog", "posts", slug]);
     ```
 
@@ -69,7 +56,7 @@ To test this out, we can use the REPL and run the following command:
 - if: /post/update
 - ```ts
     const post = $p.get(input, '/post/update')
-    post.slug = post.title.toLowerCase().replace(' ', '-');
+    post.slug = post.title.toLowerCase().replaceAll(' ', '-');
     input.post = await input.kv.set(["blog", "posts", post.slug], post);
     ```
 
