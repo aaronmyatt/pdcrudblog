@@ -12,7 +12,7 @@ Pipedown is built on top of [Deno](https://docs.deno.com/runtime/manual), so you
 Each pipe can be called the same way:
 - From a script: `await pipeName.process(input)`
 - From another pipe: 
-- ```js
+- ```
     import pipeName from 'pipeName'
     const output = await pipeName.process(input)`
     ```
