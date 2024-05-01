@@ -1,11 +1,14 @@
 # FormPage
 
 ## form
+Read the tailwind form component from a file
 ```ts
 input.form = await Deno.readTextFile('./html/form.html')
 ```
 
 ## layout
+Drop the form into the blog layout using a template literal.
+
 ```ts
 input.layout = `
 <!DOCTYPE html>
