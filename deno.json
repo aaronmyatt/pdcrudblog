@@ -1,0 +1,10 @@
+{
+  "deploy": {
+    "project": "pdcrudblog",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": ".pd/start/server.ts"
+  }
+}

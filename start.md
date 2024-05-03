@@ -1,8 +1,8 @@
 # Start
-Any pipe can be executed as a server. However, you will want to create an "entry" pipe that delegates the request to other pipes, much a like a route file in a traditional framework.
+Any pipe can be executed as a server. Run this pipe locally with: `deno run -A --unstable-kv .pd/start/server.ts`
 
 ## Index Page
-We will use a [blog template](https://github.com/davidgrzyb/tailwind-blog-template/tree/master) to make our lives easier!
+We will use a [blog template](https://github.com/davidgrzyb/tailwind-blog-template/tree/master) to make our lives easier.
 
 - route: /
 - ```ts
@@ -27,16 +27,18 @@ This is just a [form component from TailwindUI](https://tailwindui.com/component
 - route: /form/*
 - ```ts
     import formPage from 'formPage'
-    const output = await formPage.process();
-    input.body = output.layout;
+    const { layout } = await formPage.process();
+    input.body = layout;
     input.responseOptions.headers['content-type'] = 'text/html; charset=utf-8'
     ```
 
-## API CrUD
-Pass requests to [[postStore]] mapping the request path to the CRUD action.
+## APIWrite
+Pass requests to [[postStore]] mapping the request path to a write action.
 
 `const action = $p.get(input, '/route/pathname/groups/action')`
 `const output = await postStore.process({post: {[action]: input.payload}})`
+
+Note the use of `Response.redirect` to load the index page after submission rather than serving an empty JSON object.
 
 - route: /api/:action(create|update|delete)
 - ```ts
@@ -47,25 +49,20 @@ Pass requests to [[postStore]] mapping the request path to the CRUD action.
 
     try {
         const formData = await input.request.formData()
-        input.payload =  {
-            title: formData.get('title'),
-            body: formData.get('body'),
-            slug: formData.get('slug'),
-        }
+        input.payload =  Object.fromEntries(formData)
+
         const url = new URL(input.request.url)
         input.response = Response.redirect(url.origin)
     } catch(e) {
         // not form data
     } finally {
-        const output = await postStore.process({post: {[action]: input.payload}})
-        console.log(input);
-        console.log(output);
-        input.body = $p.get(output, '/posts') || $p.get(output, '/post')
+        const { post } = await postStore.process({post: {[action]: input.payload}})
+        input.body = post;
     }
     ```
 
 ## APIRead
-Pass requests to [[postStore]] mapping the request path to the CRUD action.
+Pass requests to [[postStore]] mapping the request to a read action.
 
 - route: /api/:action(list|read)
 - ```ts
